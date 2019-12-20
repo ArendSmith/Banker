@@ -1,3 +1,10 @@
+//This function handles all the GUI elements of the Bank.
+-- Users will input an amount into the DNumberWang and use the buttons to decide
+-- Whether they want to deposit or withdraw that amount. When the button is clicked
+-- the client will request the server to check if the user can perform that action
+-- if it can, the action will be performed server side, and return a message to the
+-- client for a successful action. If not the server will return a message to the
+-- client for a failed action.
 function launchbankui()
 
   local balanceamount = net.ReadInt(32)
@@ -53,12 +60,12 @@ function launchbankui()
   Bank_Text2:SetPos(40,45)
   Bank_Text2:SetSize(250,35)
   Bank_Text2:SetFont("DermaLarge")
-  //Bank_Text2:SizeToContents()
   Bank_Text2:SetWrap(true)
   Bank_Text2:SetText(balanceamount)
 
 end
 
+//The following functions handle communication between server and client.
 net.Receive("BANKER_REQUEST_INTERFACE", launchbankui)
 net.Receive( "BANK_NOT_ENOUGH_FUNDS_ERROR", function()
   notification.AddLegacy("You do not have enough money to perform this action.", NOTIFY_ERROR, 3)
