@@ -11,6 +11,9 @@ util.AddNetworkString( "BANK_NOT_ENOUGH_FUNDS_ERROR" )
 util.AddNetworkString( "BANK_FULL_ERROR_ERROR" )
 util.AddNetworkString( "BANK_DEPOSIT_CONFIRMED_MESSAGE" )
 util.AddNetworkString( "BANK_WITHDRAW_CONFIRMED_MESSAGE" )
+util.AddNetworkString( "BANKER_REQUEST_THIEF_INTERFACE" )
+util.AddNetworkString( "BANKER_SEND_SILENT_ALARM" )
+util.AddNetworkString( "BANKER_REQUEST_SILENT_ALARM_PLAY" )
 
 function ENT:Initialize()
   self:SetModel("models/player/magnusson.mdl")
@@ -133,5 +136,40 @@ net.Receive("BANK_DEPOSIT_REQUEST", function(len, ply)
     net.Start("BANK_NOT_ENOUGH_FUNDS_ERROR")
     net.Send(ply)
   end
+
+end)
+
+net.Receive("BANKER_SEND_SILENT_ALARM", function(len, ply)
+
+  local moneybag = ents.Create("banker_money_bag")
+  moneybag:SetModel("models/props_c17/BriefCase001a.mdl")
+  moneybag:SetPos(ply:GetShootPos())
+  moneybag:Spawn()
+
+  reason = "Robbing Bank"
+
+  ply:setDarkRPVar("wanted", true)
+  ply:setDarkRPVar("wantedReason", reason)
+  local actorNick = "by the Server"
+  local centerMessage = DarkRP.getPhrase("wanted_by_police", ply:Nick(), reason, actorNick)
+  local printMessage = DarkRP.getPhrase("wanted_by_police_print", actorNick, ply:Nick(), reason)
+
+  for _, ply2 in ipairs(player.GetAll()) do
+    ply2:PrintMessage(HUD_PRINTCENTER, centerMessage)
+    ply2:PrintMessage(HUD_PRINTCONSOLE, printMessage)
+  end
+
+  local table = {}
+
+  ply:EmitSound("vo/npc/vortigaunt/giveover.wav")
+
+  for k, v in pairs(player.GetAll()) do
+    if(team.GetName(v:Team()) == "Bank Security") then
+      net.Start("BANKER_REQUEST_SILENT_ALARM_PLAY")
+      net.Send(v)
+    end
+  end
+
+  timer.Simple(1.45, function() ply:EmitSound("vo/npc/male01/help01.wav") end)
 
 end)

@@ -8,6 +8,7 @@
 function launchbankui()
 
   local balanceamount = net.ReadInt(32)
+  local player = LocalPlayer()
 
   local frame = vgui.Create("DFrame")
   frame:SetSize(300,200)
@@ -17,7 +18,7 @@ function launchbankui()
   frame:SetTitle("Banker UI 0.1 by Ren")
 
   local userinput = vgui.Create("DNumberWang", frame)
-  userinput:Center()
+  userinput:SetPos(120, 120)
   userinput:SetMax(2000000000)
 
   local Button_Deposit = vgui.Create("DButton", frame)
@@ -50,18 +51,44 @@ function launchbankui()
     end
   end
 
+
+
   local Bank_Text = vgui.Create("DLabel", frame)
-  Bank_Text:SetPos(22,47)
+  Bank_Text:SetPos(22,71)
   Bank_Text:SetFont("DermaLarge")
   Bank_Text:SizeToContents()
   Bank_Text:SetText("$")
 
   local Bank_Text2 = vgui.Create("DLabel", frame)
-  Bank_Text2:SetPos(40,45)
+  Bank_Text2:SetPos(40,70)
   Bank_Text2:SetSize(250,35)
   Bank_Text2:SetFont("DermaLarge")
   Bank_Text2:SetWrap(true)
   Bank_Text2:SetText(balanceamount)
+
+  local Bank_Text3 = vgui.Create("DLabel", frame)
+  Bank_Text3:SetPos(22,30)
+  Bank_Text3:SetSize(250,35)
+  Bank_Text3:SetFont("DermaLarge")
+  Bank_Text3:SetWrap(true)
+  Bank_Text3:SetText("Bank Balance:")
+//  weapon_deagle2 weapon_fiveseven2 weapon_glock2 weapon_m42 weapon_mac102 weapon_mp52 weapon_p2282 weapon_pumpshotgun2
+  local Button_Robbery = vgui.Create("DButton", frame)
+  Button_Robbery:SetText("Rob Bank")
+  Button_Robbery:SetSize(60,30)
+  Button_Robbery:SetPos(225,27)
+  Button_Robbery:SetVisible(false)
+  if (team.GetName(player:Team()) == "Thief") then
+    if(player:GetActiveWeapon():GetClass() == "weapon_ak472" or player:GetActiveWeapon():GetClass() == "weapon_deagle2" or player:GetActiveWeapon():GetClass() == "weapon_fiveseven2"
+     or player:GetActiveWeapon():GetClass() == "weapon_glock2" or player:GetActiveWeapon():GetClass() == "weapon_m42" or player:GetActiveWeapon():GetClass() == "weapon_mac102"
+     or player:GetActiveWeapon():GetClass() == "weapon_mp52" or player:GetActiveWeapon():GetClass() == "weapon_p2282" or player:GetActiveWeapon():GetClass() == "weapon_pumpshotgun2") then
+      Button_Robbery:SetVisible(true)
+    end
+  end
+  Button_Robbery.DoClick = function(Button_Robbery)
+    net.Start("BANKER_SEND_SILENT_ALARM")
+    net.SendToServer()
+  end
 
 end
 
@@ -84,4 +111,9 @@ end)
 net.Receive(("BANK_WITHDRAW_CONFIRMED_MESSAGE"), function()
   notification.AddLegacy("You've Withdrawn: $" .. net.ReadInt(32), NOTIFY_GENERIC, 3)
   surface.PlaySound("buttons/button14.wav")
+end)
+
+net.Receive(("BANKER_REQUEST_SILENT_ALARM_PLAY"), function()
+  notification.AddLegacy("A silent alarm has been tripped by a Banker, please respond!", NOTIFY_GENERIC, 3)
+  surface.PlaySound("HL1/fvox/beep.wav")
 end)
