@@ -1,16 +1,24 @@
+//This function handles all the GUI elements of the Bank.
+-- Users will input an amount into the DNumberWang and use the buttons to decide
+-- Whether they want to deposit or withdraw that amount. When the button is clicked
+-- the client will request the server to check if the user can perform that action
+-- if it can, the action will be performed server side, and return a message to the
+-- client for a successful action. If not the server will return a message to the
+-- client for a failed action.
 function launchbankui()
 
   local balanceamount = net.ReadInt(32)
+  local player = LocalPlayer()
 
   local frame = vgui.Create("DFrame")
   frame:SetSize(300,200)
   frame:Center()
   frame:SetVisible(true)
   frame:MakePopup()
-  frame:SetTitle("Banker UI 0.1 by Ren")
+  frame:SetTitle("Bank of " .. CONFIG_SERVER_NAME)
 
   local userinput = vgui.Create("DNumberWang", frame)
-  userinput:Center()
+  userinput:SetPos(120, 120)
   userinput:SetMax(2000000000)
 
   local Button_Deposit = vgui.Create("DButton", frame)
@@ -43,22 +51,48 @@ function launchbankui()
     end
   end
 
+
+
   local Bank_Text = vgui.Create("DLabel", frame)
-  Bank_Text:SetPos(22,47)
+  Bank_Text:SetPos(22,71)
   Bank_Text:SetFont("DermaLarge")
   Bank_Text:SizeToContents()
   Bank_Text:SetText("$")
 
   local Bank_Text2 = vgui.Create("DLabel", frame)
-  Bank_Text2:SetPos(40,45)
+  Bank_Text2:SetPos(40,70)
   Bank_Text2:SetSize(250,35)
   Bank_Text2:SetFont("DermaLarge")
-  //Bank_Text2:SizeToContents()
   Bank_Text2:SetWrap(true)
   Bank_Text2:SetText(balanceamount)
 
+  local Bank_Text3 = vgui.Create("DLabel", frame)
+  Bank_Text3:SetPos(22,30)
+  Bank_Text3:SetSize(250,35)
+  Bank_Text3:SetFont("DermaLarge")
+  Bank_Text3:SetWrap(true)
+  Bank_Text3:SetText("Bank Balance:")
+//  weapon_deagle2 weapon_fiveseven2 weapon_glock2 weapon_m42 weapon_mac102 weapon_mp52 weapon_p2282 weapon_pumpshotgun2
+  local Button_Robbery = vgui.Create("DButton", frame)
+  Button_Robbery:SetText("Rob Bank")
+  Button_Robbery:SetSize(60,30)
+  Button_Robbery:SetPos(225,27)
+  Button_Robbery:SetVisible(false)
+  if (team.GetName(player:Team()) == "Thief") then
+    for count = 1, table.getn(CONFIG_GUN_CHECK_LIST) do
+      if(CONFIG_GUN_CHECK_LIST[count] == player:GetActiveWeapon():GetClass()) then
+        Button_Robbery:SetVisible(true)
+      end
+    end
+  end
+  Button_Robbery.DoClick = function(Button_Robbery)
+    net.Start("BANKER_SEND_SILENT_ALARM")
+    net.SendToServer()
+  end
+
 end
 
+//The following functions handle communication between server and client.
 net.Receive("BANKER_REQUEST_INTERFACE", launchbankui)
 net.Receive( "BANK_NOT_ENOUGH_FUNDS_ERROR", function()
   notification.AddLegacy("You do not have enough money to perform this action.", NOTIFY_ERROR, 3)
@@ -77,4 +111,14 @@ end)
 net.Receive(("BANK_WITHDRAW_CONFIRMED_MESSAGE"), function()
   notification.AddLegacy("You've Withdrawn: $" .. net.ReadInt(32), NOTIFY_GENERIC, 3)
   surface.PlaySound("buttons/button14.wav")
+end)
+
+net.Receive(("BANKER_REQUEST_SILENT_ALARM_PLAY"), function()
+  notification.AddLegacy("A silent alarm has been tripped by a Banker, please respond!", NOTIFY_GENERIC, 6)
+  surface.PlaySound("HL1/fvox/beep.wav")
+end)
+
+net.Receive(("BANKER_ROBBERY_ON_COOLDOWN_WARNING"), function()
+  notification.AddLegacy("Someone has recently robbed the bank! There is a cooldown of " .. net.ReadInt(32) .." seconds until the bank can be robbed again.", NOTIFY_ERROR, 6)
+  surface.PlaySound("buttons/button10.wav")
 end)
