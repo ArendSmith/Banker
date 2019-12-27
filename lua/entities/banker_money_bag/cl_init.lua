@@ -29,6 +29,24 @@ net.Receive(("BANKER_MONEY_BAG_TIMER_ERROR"), function()
 end)
 
 net.Receive(("BANKER_MONEY_BAG_SUCCESS_MESSAGE"), function()
-  notification.AddLegacy("You stole $500!", NOTIFY_GENERIC, 3)
-  surface.PlaySound("vo/Citadel/al_success_yes.wav")
+  local player = LocalPlayer()
+
+  if(team.GetName(player:Team()) == "Thief") then
+    notification.AddLegacy("You stole $" .. CONFIG_MONEY_BAG_THIEF_REWARD .. "!", NOTIFY_GENERIC, 3)
+    surface.PlaySound("vo/Citadel/al_success_yes.wav")
+
+  elseif(team.GetName(player:Team()) == "Bank Security") then
+    notification.AddLegacy("You recovered the stolen money! You receive a $" .. CONFIG_MONEY_BAG_SECURITY_REWARD .. " bonus!" , NOTIFY_GENERIC, 3)
+    surface.PlaySound("vo/Citadel/al_success_yes.wav")
+
+  else
+    notification.AddLegacy("You shouldn't be rewarded, but some how you were! [DEV ERROR]", NOTIFY_ERROR, 3)
+    surface.PlaySound("buttons/button10.wav")
+  end
+end)
+
+net.Receive(("BANKER_WRONG_JOB_ERROR"), function()
+  notification.AddLegacy("This item has nothing to do with your job type!", NOTIFY_ERROR, 3)
+  surface.PlaySound("buttons/button10.wav")
+
 end)
