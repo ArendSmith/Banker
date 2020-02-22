@@ -26,6 +26,7 @@ function ENT:Initialize()
   self:CapabilitiesAdd(CAP_ANIMATEDFACE)
   self:SetUseType(SIMPLE_USE)
   self:DropToFloor()
+  self.SetAnimation(ACT_HL2MP_IDLE)
 
 end
 

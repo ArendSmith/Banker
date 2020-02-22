@@ -28,13 +28,13 @@ CONFIG_MONEY_BAG_SECURITY_REWARD = 250
 
 -- WARNING: Use a 32-bit number and it will reflect in seconds in-game.
 
-CONFIG_MONEY_BAG_TIMER = 30
+CONFIG_MONEY_BAG_TIMER = 300
 
 // Robbery Cooldown //
 -- This variable controls the cooldown between robberies.
 -- WARNING: Use a 32-bit number and it will reflect in seconds in-game.
 
-CONFIG_ROBBERY_COOLDOWN = 10
+CONFIG_ROBBERY_COOLDOWN = 600
 
 // Max amount of money that can be stored in the bank //
 -- Title explains itself
