@@ -1,4 +1,4 @@
-Banker DarkRP Addon by Ren 1.0 (RETAIL LAUNCH)
+Banker DarkRP Addon by Arend Smith 1.0 (RETAIL LAUNCH)
 ----------------------------------------
 
 This mod creates an entity called 'Banker'. This NPC will prompt a UI which allows players to either withdraw or
